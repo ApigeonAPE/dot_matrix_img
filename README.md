@@ -1,0 +1,1 @@
+[![Deploy static content to Pages](https://github.com/ApigeonAPE/dot_matrix_img/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/ApigeonAPE/dot_matrix_img/actions/workflows/static.yml)
