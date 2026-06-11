@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>点阵生成器 · DotMatrix</title>
+<style>
+:root{--bg:#1a1a2e;--panel:#16213e;--text:#e0e0e0;--accent:#e94560;--accent2:#0f9b8e;--border:#2a2a4a;--input:#0d1b36}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Microsoft YaHei',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--panel);padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+header h1{font-size:1.1rem;font-weight:600;letter-spacing:.5px}
+header .dot{color:var(--accent)}
+main{display:flex;flex:1;overflow:hidden}
+/* ---- 左栏 ---- */
+#panel{width:300px;max-width:38vw;min-width:250px;background:var(--panel);padding:12px;overflow-y:auto;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+#panel h2{font-size:.85rem;letter-spacing:1px;color:var(--accent)}
+.field{display:flex;flex-direction:column;gap:3px}
+.field-row{display:flex;gap:4px}
+.field-row .field{flex:1;min-width:0}
+.field label{font-size:.68rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.field input[type=text]{background:var(--input);border:1px solid var(--border);color:var(--text);padding:5px 7px;border-radius:4px;font-size:.82rem;outline:none;width:100%}
+.field input[type=text]:focus{border-color:var(--accent2)}
+input[type=color]{width:32px;height:24px;border:1px solid var(--border);border-radius:3px;cursor:pointer;padding:0;background:var(--input);flex-shrink:0}
+.color-row{display:flex;align-items:center;gap:4px}
+.color-row span{font-size:.67rem;color:#888;font-family:monospace;min-width:50px}
+.section-label{font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;color:#555;border-top:1px solid #1a1a3a;padding-top:4px}
+/* ---- 右栏 ---- */
+#preview-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;background:#111;gap:8px;min-width:0;overflow:hidden}
+#canvas-wrap{background:#000;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;padding:4px;max-width:100%;overflow:hidden}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;max-width:100%!important;height:auto!important}
+#info-bar{font-size:.7rem;color:#555;text-align:center;flex-shrink:0}
+.btn{font-size:.75rem;font-weight:600;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;color:#fff;white-space:nowrap}
+.btn-primary{background:var(--accent)}.btn-primary:hover{background:#ff6b81}
+.btn-secondary{background:var(--accent2)}.btn-secondary:hover{background:#15b8a8}
+.btn-row{display:flex;gap:4px;flex-wrap:wrap}
+.zoom-row{display:flex;align-items:center;gap:6px}
+.zoom-row label{font-size:.68rem;color:#aaa;white-space:nowrap}
+.zoom-row input[type=range]{flex:1;accent-color:var(--accent2);min-width:40px}
+.zoom-row span{font-size:.7rem;min-width:28px;text-align:right}
+#status{font-size:.68rem;color:#888;min-height:16px;text-align:center}
+#status.error{color:#e94560}#status.success{color:#0f9b8e}
+@media(max-width:700px){main{flex-direction:column}#panel{width:100%;max-width:100%;min-width:0;max-height:42vh;border-right:none;border-bottom:1px solid var(--border)}#preview-area{padding:4px}}
+</style>
+</head>
+<body>
+<header><h1><span class="dot">●</span> DotMatrix</h1><span style="color:#666;font-size:.75rem">点阵矩阵生成器</span></header>
+<main>
+<div id="panel">
+  <h2>⬆ 上区</h2>
+  <div class="section-label">左区 60列</div>
+  <div class="field-row">
+    <div class="field"><label>中文 · 最多4字</label><input type="text" id="chLeft" maxlength="4" value="特快"></div>
+    <div class="field"><label>英文 · 最多10字</label><input type="text" id="enLeft" maxlength="10" value="Express"></div>
+  </div>
+  <div class="color-row"><input type="color" id="bgColor" value="#00dcdc"><span>背景色</span></div>
+  <div class="color-row"><input type="color" id="tcULCn" value="#ffffff"><span>中文色</span></div>
+  <div class="color-row"><input type="color" id="tcULEn" value="#ffc800"><span>英文色</span></div>
+
+  <div class="section-label">右区 100列</div>
+  <div class="field-row">
+    <div class="field"><label>中文 · 最多6字</label><input type="text" id="chRight" maxlength="6" value="南京北站"></div>
+    <div class="field"><label>英文 · 最多16字</label><input type="text" id="enRight" maxlength="16" value="Nanjingbei St."></div>
+  </div>
+  <div class="color-row"><input type="color" id="tcURCn" value="#ffffff"><span>中文色</span></div>
+  <div class="color-row"><input type="color" id="tcUREn" value="#ffc800"><span>英文色</span></div>
+
+  <h2>⬇ 下区</h2>
+  <div class="field-row">
+    <div class="field"><label>中文 · 最多12字</label><input type="text" id="chLower" maxlength="12" value="龙王山"></div>
+    <div class="field"><label>英文 · 最多26字</label><input type="text" id="enLower" maxlength="26" value="Longwang Mt."></div>
+  </div>
+  <div class="color-row"><input type="color" id="tcLoCn" value="#ffffff"><span>中文色</span></div>
+  <div class="color-row"><input type="color" id="tcLoEn" value="#ffc800"><span>英文色</span></div>
+  <div id="status">就绪</div>
+</div>
+
+<div id="preview-area">
+  <div id="canvas-wrap"><canvas id="c" width="160" height="80"></canvas></div>
+  <div id="info-bar">160×80 px</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="downloadPNG()">⬇ 下载 PNG</button>
+    <div class="zoom-row">
+      <label>缩放</label>
+      <input type="range" id="zoomSlider" min="1" max="6" value="3" oninput="updateZoom()">
+      <span id="zoomLabel">3x</span>
+    </div>
+  </div>
+</div>
+</main>
+
+<script src="index.js"></script>
+</body>
+</html>
