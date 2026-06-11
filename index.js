@@ -120,7 +120,7 @@ function chDot(hzk, ch, fs) {
   const buf = hzk.slice(offset, offset + cfg.bpc);
   const result = Array.from({ length: fs }, () => new Array(fs).fill(0));
 
-  if (fs === 40 || fs === 12 || fs === 14) {
+  if (fs === 40 || fs === 12 || fs === 14 || fs === 32) {
     // 行转置: bit7 = 左列
     const bytesPerRow = cfg.bpc / fs;
     for (let row = 0; row < fs; row++) {
