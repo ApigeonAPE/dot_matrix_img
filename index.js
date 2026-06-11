@@ -120,8 +120,8 @@ function chDot(hzk, ch, fs) {
   const buf = hzk.slice(offset, offset + cfg.bpc);
   const result = Array.from({ length: fs }, () => new Array(fs).fill(0));
 
-  if (fs === 40 || fs === 12 || fs === 14) {
-    // 行转置: bit7 = 左列 (HZK40/HZK12/HZK14)
+  if (fs === 40 || fs === 12 || fs === 14 || fs === 32) {
+    // 行转置: bit7 = 左列 (HZK40/HZK12/HZK14/HZK32)
     const bytesPerRow = cfg.bpc / fs;
     for (let row = 0; row < fs; row++) {
       const rowBase = row * bytesPerRow;
@@ -132,7 +132,7 @@ function chDot(hzk, ch, fs) {
       }
     }
   } else {
-    // 列转置: bit7 = 顶行 (HZK24/HZK32)
+    // 列转置: bit7 = 顶行 (HZK24)
     const bytesPerCol = cfg.bpc / fs;
     for (let row = 0; row < fs; row++) {
       for (let col = 0; col < fs; col++) {
