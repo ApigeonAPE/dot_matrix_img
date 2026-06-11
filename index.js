@@ -143,17 +143,6 @@ function chDot(hzk, ch, fs) {
       }
     }
   }
-    // 列转置: bit7 = 顶行
-    const bytesPerCol = cfg.bpc / fs;
-    for (let row = 0; row < fs; row++) {
-      for (let col = 0; col < fs; col++) {
-        const colBase = col * bytesPerCol;
-        const byteIdx = row >>> 3;
-        const bitIdx = row & 7;
-        if (buf[colBase + byteIdx] & (1 << (7 - bitIdx))) result[row][col] = 1;
-      }
-    }
-  }
   return result;
 }
 
